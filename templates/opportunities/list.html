@@ -1,0 +1,62 @@
+{% extends 'opportunities/base.html' %}
+{% block content %}
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> A WORLD OF POSSIBILITIES</p>
+      <h1 id="page-title">Find your next<br><span>opportunity.</span></h1>
+      <p class="hero-description">Internships, jobs, and events for your next chapter.<br class="desktop-break"> Find the right fit and take the first step.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="hero-arrow">↗</span><span class="art-spark">✦</span></div>
+  </section>
+
+  <section class="filter-panel" aria-label="Find opportunities">
+    <form method="get" action="{% url 'opportunities:list' %}">
+      {% if form.errors %}<p class="filter-alert" role="alert">Check the highlighted filters to see matching opportunities.</p>{% endif %}
+      <div class="search-field field">
+        <label for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
+        <div class="search-input"><span aria-hidden="true">⌕</span>{{ form.q }}</div>
+        {{ form.q.errors }}
+      </div>
+      <div class="filter-grid">
+        <div class="field"><label for="{{ form.type.id_for_label }}">{{ form.type.label }}</label>{{ form.type }}{{ form.type.errors }}</div>
+        <div class="field"><label for="{{ form.event_type.id_for_label }}">{{ form.event_type.label }}</label>{{ form.event_type }}{{ form.event_type.errors }}</div>
+        <div class="field"><label for="{{ form.source.id_for_label }}">{{ form.source.label }}</label>{{ form.source }}{{ form.source.errors }}</div>
+        <div class="field"><label for="{{ form.sort.id_for_label }}">{{ form.sort.label }}</label>{{ form.sort }}{{ form.sort.errors }}</div>
+      </div>
+      <div class="filter-actions">
+        <label class="checkbox-label" for="{{ form.hide_seminars.id_for_label }}">{{ form.hide_seminars }} <span>{{ form.hide_seminars.label }}</span></label>
+        <div class="filter-buttons">{% if has_filters or form.errors %}<a class="reset-link" href="{% url 'opportunities:list' %}">Reset filters</a>{% endif %}<button class="button button-primary" type="submit">Find opportunities <span aria-hidden="true">→</span></button></div>
+      </div>
+    </form>
+  </section>
+
+  <section class="results-section" aria-labelledby="results-heading">
+    <div class="results-heading"><div><p class="section-eyebrow">EXPLORE WHAT'S NEXT</p><h2 id="results-heading">{{ result_count }} opportunit{{ result_count|pluralize:'y,ies' }}</h2></div>{% if page_obj.paginator.num_pages > 1 %}<p class="page-summary">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>{% endif %}</div>
+    <div class="opportunity-grid">
+      {% for opportunity in opportunities %}
+        <article class="opportunity-card">
+          <div class="card-topline"><span class="type-badge {% if 'opportunity type' in opportunity.missing_details %}type-unspecified{% else %}type-{{ opportunity.type }}{% endif %}">{% if 'opportunity type' in opportunity.missing_details %}Type not specified{% else %}{{ opportunity.get_type_display }}{% endif %}</span><span class="source-label">{{ opportunity.get_source_display }}</span></div>
+          {% if opportunity.has_missing_details %}<p class="incomplete-marker">Details incomplete</p>{% endif %}
+          {% if opportunity.type == 'event' and opportunity.event_type %}<p class="event-format">{{ opportunity.get_event_type_display }}</p>{% endif %}
+          <h3><a href="{% url 'opportunities:detail' opportunity.pk %}">{{ opportunity.title }}</a></h3>
+          <p class="organization">{% if 'organization' in opportunity.missing_details %}Organization not specified{% else %}{{ opportunity.organization }}{% endif %}</p>
+          {% if opportunity.description %}<p class="card-description">{{ opportunity.description|truncatewords:24 }}</p>{% endif %}
+          {% if opportunity.employment_type or opportunity.work_mode %}<ul class="arrangements" aria-label="Working arrangement">{% if opportunity.employment_type %}<li>{{ opportunity.get_employment_type_display }}</li>{% endif %}{% if opportunity.work_mode %}<li>{{ opportunity.get_work_mode_display }}</li>{% endif %}</ul>{% endif %}
+          <div class="card-bottom">
+            <dl class="card-facts">{% if opportunity.location %}<div><dt>Location</dt><dd>{{ opportunity.location }}</dd></div>{% endif %}{% if opportunity.deadline %}<div><dt>Apply by</dt><dd><time datetime="{{ opportunity.deadline|date:'Y-m-d' }}">{{ opportunity.deadline|date:'M j, Y' }}</time></dd></div>{% endif %}</dl>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-state"><span class="empty-symbol" aria-hidden="true">↗</span><h3>No opportunities found</h3><p>{% if has_filters or form.errors %}Try another keyword or adjust your filters to explore more possibilities.{% else %}Your next opportunity could be just around the corner. Check back soon.{% endif %}</p>{% if has_filters or form.errors %}<a class="button button-secondary" href="{% url 'opportunities:list' %}">Explore all opportunities</a>{% endif %}</div>
+      {% endfor %}
+    </div>
+    {% if page_obj.has_other_pages %}
+      <nav class="pagination" aria-label="Opportunity pages">
+        {% if page_obj.has_previous %}<a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" rel="prev">← Previous</a>{% else %}<span class="page-disabled">← Previous</span>{% endif %}
+        <span class="page-position" aria-current="page">{{ page_obj.number }} <span>of {{ page_obj.paginator.num_pages }}</span></span>
+        {% if page_obj.has_next %}<a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.next_page_number }}" rel="next">Next →</a>{% else %}<span class="page-disabled">Next →</span>{% endif %}
+      </nav>
+    {% endif %}
+  </section>
+{% endblock %}

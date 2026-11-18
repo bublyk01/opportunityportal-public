@@ -1,0 +1,38 @@
+{% extends "admin/change_list.html" %}
+{% load admin_urls %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .object-tools .publish-all-drafts-form { margin: 0; }
+    .object-tools .publish-all-drafts-button {
+      background: var(--object-tools-bg);
+      color: var(--object-tools-fg);
+      border: 0;
+      border-radius: 15px;
+      padding: 3px 12px;
+      font: inherit;
+      line-height: 20px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .object-tools .publish-all-drafts-button:hover,
+    .object-tools .publish-all-drafts-button:focus-visible {
+      background: var(--object-tools-hover-bg);
+    }
+  </style>
+{% endblock %}
+
+{% block object-tools-items %}
+  {% if can_publish_all_drafts and publish_all_drafts_count %}
+    <li>
+      <form method="post" action="{% url opts|admin_urlname:'publish_all_drafts' %}" class="publish-all-drafts-form">
+        {% csrf_token %}
+        <button type="submit" class="publish-all-drafts-button" title="Publish every draft across all pages and filters.">
+          Publish all drafts ({{ publish_all_drafts_count }})
+        </button>
+      </form>
+    </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153f50">
+  <title>{% block title %}OpportunityHub · Find your next opportunity{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/opportunities.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="OpportunityHub home">
+        <span class="brand-mark" aria-hidden="true">O<span>H</span></span>
+        <span>Opportunity<span class="brand-accent">Hub</span></span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="explore-link" href="{% url 'opportunities:list' %}">Explore opportunities</a>
+        <a class="staff-link" href="{% url 'admin:index' %}">{% if request.user.is_staff %}Staff admin{% else %}Staff sign in{% endif %} <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+  <main id="main-content" class="container" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer container">
+    <span class="footer-brand">OpportunityHub</span>
+    <p>A little curiosity. Your next big step.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends 'opportunities/base.html' %}
+{% block title %}{{ opportunity.title }} · OpportunityHub{% endblock %}
+{% block content %}
+  <a class="back-link" href="{% url 'opportunities:list' %}">← All opportunities</a>
+  <article class="detail-layout">
+    <div class="detail-main">
+      <header class="detail-heading"><div class="detail-badges"><span class="type-badge {% if 'opportunity type' in opportunity.missing_details %}type-unspecified{% else %}type-{{ opportunity.type }}{% endif %}">{% if 'opportunity type' in opportunity.missing_details %}Type not specified{% else %}{{ opportunity.get_type_display }}{% endif %}</span>{% if opportunity.type == 'event' and opportunity.event_type %}<span class="detail-event-format">{{ opportunity.get_event_type_display }}</span>{% endif %}{% if opportunity.has_missing_details %}<span class="incomplete-marker">Details incomplete</span>{% endif %}</div><h1>{{ opportunity.title }}</h1><p class="detail-organization">{% if 'organization' in opportunity.missing_details %}Organization not specified{% else %}{{ opportunity.organization }}{% endif %}</p></header>
+      {% if opportunity.has_missing_details %}<p class="incomplete-notice">Some details have not been provided. Check the original posting for the {{ opportunity.missing_details|join:' and ' }}.</p>{% endif %}
+      <section class="description-section" aria-labelledby="description-heading"><h2 id="description-heading">About this opportunity</h2>{% if opportunity.description %}<div class="description-text">{{ opportunity.description|linebreaks }}</div>{% else %}<p class="muted">Visit the original posting for more details.</p>{% endif %}</section>
+    </div>
+    <aside class="detail-sidebar" aria-labelledby="at-a-glance">
+      <p class="section-eyebrow">YOUR NEXT STEP</p><h2 id="at-a-glance">At a glance</h2>
+      <dl class="detail-facts"><div><dt>Organization</dt><dd>{% if 'organization' in opportunity.missing_details %}Organization not specified{% else %}{{ opportunity.organization }}{% endif %}</dd></div><div><dt>Opportunity type</dt><dd>{% if 'opportunity type' in opportunity.missing_details %}Type not specified{% else %}{{ opportunity.get_type_display }}{% endif %}</dd></div>{% if opportunity.type == 'event' and opportunity.event_type %}<div><dt>Event format</dt><dd>{{ opportunity.get_event_type_display }}</dd></div>{% endif %}{% if opportunity.location %}<div><dt>Location</dt><dd>{{ opportunity.location }}</dd></div>{% endif %}{% if opportunity.work_mode %}<div><dt>Work arrangement</dt><dd>{{ opportunity.get_work_mode_display }}</dd></div>{% endif %}{% if opportunity.employment_type %}<div><dt>Working hours</dt><dd>{{ opportunity.get_employment_type_display }}</dd></div>{% endif %}{% if opportunity.deadline %}<div><dt>Application deadline</dt><dd><time datetime="{{ opportunity.deadline|date:'Y-m-d' }}">{{ opportunity.deadline|date:'F j, Y' }}</time></dd></div>{% endif %}<div><dt>Source</dt><dd>{{ opportunity.get_source_display }}</dd></div></dl>
+      {% if original_url %}<a class="button button-primary original-link" href="{{ original_url }}" target="_blank" rel="noopener noreferrer">View original posting <span aria-hidden="true">↗</span></a>{% endif %}
+    </aside>
+  </article>
+{% endblock %}
